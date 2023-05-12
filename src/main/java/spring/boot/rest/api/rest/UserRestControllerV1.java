@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import spring.boot.rest.api.dto.EventDTO;
 import spring.boot.rest.api.dto.UserCreateDTO;
 import spring.boot.rest.api.dto.UserDTO;
 import spring.boot.rest.api.dto.UserUpdateDTO;
@@ -75,5 +76,14 @@ public class UserRestControllerV1 {
         userService.deleteAll();
         log.info("IN [DELETE] deleteAll() -> all users deleted SUCCESSFULLY");
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}/events")
+    @PreAuthorize("hasAuthority('read:self')")
+    public ResponseEntity<List<EventDTO>> findEvents(@PathVariable("id") Long id){
+        log.info("IN [GET] findEvents() -> finding events by user id - {}...", id);
+        List<EventDTO> foundEvents = userService.findEvents(id);
+        log.info("IN [GET] findEvents() -> finding events by user id - {} -> SUCCESSFULLY", id);
+        return new ResponseEntity<>(foundEvents, HttpStatus.OK);
     }
 }

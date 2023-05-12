@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "files")
@@ -17,10 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class File {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class File extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "s3_secret", unique = true, nullable = false)
@@ -29,11 +23,5 @@ public class File {
     private String s3Bucket;
     @Column(name = "location", nullable = false)
     private String location;
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-    @Enumerated(EnumType.STRING)
-    private Status status;
 }
 

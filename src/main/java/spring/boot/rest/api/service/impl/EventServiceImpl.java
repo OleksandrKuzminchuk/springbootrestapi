@@ -23,6 +23,7 @@ import spring.boot.rest.api.repository.UserRepo;
 import spring.boot.rest.api.service.BaseService;
 import spring.boot.rest.api.service.EventService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,8 @@ public class EventServiceImpl extends BaseService implements EventService {
             saveEvent.setStatus(Status.ACTIVE);
             saveEvent.setUser(addUser);
             saveEvent.setFile(addFile);
+            saveEvent.setCreatedAt(LocalDateTime.now());
+            saveEvent.setUpdatedAt(LocalDateTime.now());
             Event savedEvent = getEventRepo().save(saveEvent);
             EventDTO savedEventDTO = getEventMapper().map(savedEvent);
             log.info("IN save() event -> '{}' saved SUCCESSFULLY", savedEventDTO);
@@ -71,6 +74,7 @@ public class EventServiceImpl extends BaseService implements EventService {
             updateEvent.setUser(newAddUser);
             updateEvent.setFile(newAddFile);
             updateFieldsIfDifferent(existingEvent, updateEvent);
+            existingEvent.setUpdatedAt(LocalDateTime.now());
             Event updatedEvent = getEventRepo().save(existingEvent);
             EventDTO updatedEventDTO = getEventMapper().map(updatedEvent);
             log.info("IN update() event -> '{}' updated SUCCESSFULLY", updatedEvent);

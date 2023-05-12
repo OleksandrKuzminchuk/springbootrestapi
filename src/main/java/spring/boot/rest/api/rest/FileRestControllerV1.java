@@ -32,7 +32,6 @@ public class FileRestControllerV1 {
     }
 
     @PostMapping("/upload")
-    @PreAuthorize("hasAuthority('upload:file')")
     public ResponseEntity<FileDTO> uploadFile(@RequestParam("file") MultipartFile file) {
         log.info("IN [POST] uploadFile() -> uploading file...");
         FileDTO uploadedFile = fileService.upload(file);
@@ -57,6 +56,7 @@ public class FileRestControllerV1 {
     }
 
     @GetMapping("/download")
+    @PreAuthorize("hasAuthority('download:file')")
     public ResponseEntity<byte[]> downloadFile(@RequestBody FileDownloadRequest request) {
         log.info("IN downloadFile() -> downloading file...");
         String fileName = request.getS3Secret()

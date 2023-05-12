@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spring.boot.rest.api.dto.EventDTO;
 import spring.boot.rest.api.dto.UserCreateDTO;
 import spring.boot.rest.api.dto.UserDTO;
 import spring.boot.rest.api.dto.UserUpdateDTO;
@@ -16,6 +17,7 @@ import spring.boot.rest.api.exception.DatabaseOperationException;
 import spring.boot.rest.api.mapper.EventMapper;
 import spring.boot.rest.api.mapper.FileMapper;
 import spring.boot.rest.api.mapper.UserMapper;
+import spring.boot.rest.api.model.Event;
 import spring.boot.rest.api.model.Permission;
 import spring.boot.rest.api.model.Status;
 import spring.boot.rest.api.model.User;
@@ -25,6 +27,7 @@ import spring.boot.rest.api.repository.UserRepo;
 import spring.boot.rest.api.service.BaseService;
 import spring.boot.rest.api.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +51,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             log.info("IN save() user -> '{}'...", userCreateDTO);
             User saveUser = getUserMapper().map(userCreateDTO);
             saveUser.setStatus(Status.ACTIVE);
+            saveUser.setCreatedAt(LocalDateTime.now());
+            saveUser.setUpdatedAt(LocalDateTime.now());
             User savedUser = getUserRepo().save(saveUser);
             UserDTO savedUserDTO = getUserMapper().map(savedUser);
             log.info("IN save() user -> '{}' -> saved SUCCESSFULLY", savedUserDTO);
@@ -65,6 +70,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         User existingUser = checkIfUserExists(updateUser.getId());
         try {
             updateFieldsIfDifferent(existingUser, updateUser);
+            existingUser.setUpdatedAt(LocalDateTime.now());
             User updatedUser = getUserRepo().save(existingUser);
             UserDTO updatedUserDTO = getUserMapper().map(updatedUser);
             log.info("IN update() user -> '{}' -> updated SUCCESSFULLY", updatedUserDTO);
@@ -80,10 +86,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         log.info("IN findById() - find user with id '{}'...", id);
         User foundUser = checkIfUserExists(id);
         log.debug("IN findById() - checking user's status for access");
-        if (foundUser.getStatus().equals(Status.DELETED) && !currentUserIsModeratorOrAdmin()) {
-            log.error("IN findById() - access denied: user with id '{}' is DELETED", id);
-            throw new AccessDeniedException(format(ACCESS_DENIED_USER_DELETED, id));
-        }
+        isUserDeletedAndCurrentUserNotAdminOrModerator(id, foundUser);
         UserDTO foundUserDTO = getUserMapper().map(foundUser);
         log.info("IN findById() - find user with id '{}' -> found SUCCESSFULLY", id);
         return foundUserDTO;
@@ -132,6 +135,31 @@ public class UserServiceImpl extends BaseService implements UserService {
         } catch (DataAccessException e) {
             log.error("IN deleteAll() users -> FAILED");
             throw new DatabaseOperationException(FAILED_TO_DELETE_ALL_USERS, e);
+        }
+    }
+
+    @Override
+    public List<EventDTO> findEvents(Long id) {
+        log.info("IN findEvents(id) events -> find events by user id - '{}'...", id);
+        User foundUser = checkIfUserExists(id);
+        try {
+            log.debug("IN findEvents() - checking user's status for access");
+            isUserDeletedAndCurrentUserNotAdminOrModerator(id, foundUser);
+            List<Event> foundEvents = foundUser.getEvents().stream()
+                    .filter(event -> event.getStatus().equals(Status.ACTIVE))
+                    .collect(Collectors.toList());
+            log.info("IN findEvents(id) events -> find events by user id - '{}' -> SUCCESSFULLY", id);
+            return foundEvents.stream().map(getEventMapper()::map).collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            log.error("IN findEvents(id) events -> find events by user id - '{}' -> FAILED", id);
+            throw new DatabaseOperationException(format(FAILED_TO_EVENTS_BY_USER_ID, id), e);
+        }
+    }
+
+    private void isUserDeletedAndCurrentUserNotAdminOrModerator(Long id, User foundUser) {
+        if (foundUser.getStatus().equals(Status.DELETED) && !currentUserIsModeratorOrAdmin()) {
+            log.error("IN findById() - access denied: user with id '{}' is DELETED", id);
+            throw new AccessDeniedException(format(ACCESS_DENIED_USER_DELETED, id));
         }
     }
 

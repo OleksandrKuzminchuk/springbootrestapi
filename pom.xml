@@ -20,6 +20,7 @@
         <org.mockito.junit.version>4.5.1</org.mockito.junit.version>
         <software.amazon.awssdk.version>2.20.26</software.amazon.awssdk.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
+
     </properties>
 
     <dependencies>

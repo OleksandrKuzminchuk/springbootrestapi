@@ -32,6 +32,7 @@ public interface EventMapper {
     @Mapping(source = "userId", target = "user", qualifiedByName = "mapIdToUser")
     @Mapping(source = "fileId", target = "file", qualifiedByName = "mapIdToFile")
     Event map(EventUpdateDTO eventUpdateDTO);
+
     @Named("mapUserToId")
     default Long mapUserToId(User user) {
         return user != null ? user.getId() : null;

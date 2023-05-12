@@ -4,9 +4,14 @@ import spring.boot.rest.api.model.Role;
 
 public final class Constants {
 
+
+    public static final String INVALID_JWT_AUTH_EXCEPTION = "Invalid jwt authentication exception";
+    public static final String USERNAME_NOT_FOUND_EXCEPTION = "Username not found exception";
+
     private Constants() {
         throw new IllegalStateException(TEXT_UTILITY_CLASS);
     }
+    public static final String FAILED_TO_EVENTS_BY_USER_ID = "Failed to find events by user id - [%d]";
 
     public static final String DATABASE_OPERATION_ERROR = "Database Operation Error: ";
     public static final String DATABASE_OPERATION_ERROR_FAILED_TO_FIND_USER = DATABASE_OPERATION_ERROR + "Failed to find user by id - %d";

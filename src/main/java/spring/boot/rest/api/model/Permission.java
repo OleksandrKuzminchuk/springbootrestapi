@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Permission {
     READ_SELF("read:self"),
-    UPLOAD_FILE("upload:file"),
+    DOWNLOAD_FILE("download:file"),
     READ_WRITE_DELETE_EVENTS("read_write_delete:events"),
     READ_WRITE_DELETE_USERS("read_write_delete:users"),
     READ_WRITE_DELETE_FILES("read_write_delete:files"),
