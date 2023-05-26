@@ -1,98 +1,85 @@
 package spring.boot.rest.api.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import spring.boot.rest.api.dto.EventCreateDTO;
-import spring.boot.rest.api.dto.EventDTO;
-import spring.boot.rest.api.dto.EventUpdateDTO;
 import spring.boot.rest.api.exception.DatabaseOperationException;
 import spring.boot.rest.api.exception.NotFoundException;
-import spring.boot.rest.api.mapper.EventMapper;
-import spring.boot.rest.api.mapper.FileMapper;
-import spring.boot.rest.api.mapper.UserMapper;
 import spring.boot.rest.api.model.Event;
-import spring.boot.rest.api.model.File;
 import spring.boot.rest.api.model.Status;
-import spring.boot.rest.api.model.User;
 import spring.boot.rest.api.repository.EventRepo;
-import spring.boot.rest.api.repository.FileRepo;
-import spring.boot.rest.api.repository.UserRepo;
-import spring.boot.rest.api.service.BaseService;
 import spring.boot.rest.api.service.EventService;
+import spring.boot.rest.api.service.FileService;
+import spring.boot.rest.api.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static org.springframework.data.domain.Sort.Order.by;
-import static spring.boot.rest.api.util.constant.Constants.*;
+import static spring.boot.rest.api.util.Constants.*;
 
 @Slf4j
 @Service
 @Transactional
-public class EventServiceImpl extends BaseService implements EventService {
+@RequiredArgsConstructor
+public class EventServiceImpl implements EventService {
 
-    public EventServiceImpl(EventRepo eventRepo, UserRepo userRepo, FileRepo fileRepo,
-                            EventMapper eventMapper, UserMapper userMapper, FileMapper fileMapper) {
-        super(eventRepo, userRepo, fileRepo, eventMapper, userMapper, fileMapper);
-    }
+    private final EventRepo eventRepo;
+    private final UserService userService;
+    private final FileService fileService;
 
     @Override
-    public EventDTO save(EventCreateDTO eventCreateDTO) {
-        log.info("IN save() event -> '{}'...", eventCreateDTO);
-        User addUser = checkIfUserExists(eventCreateDTO.getUserId());
-        File addFile = checkIfFileExists(eventCreateDTO.getFileId());
+    public Event save(Event event) {
+        log.info("IN save() event -> '{}'...", event);
+        final var addUser = userService.checkIfUserExists(event.getUser().getId());
+        final var addFile = fileService.checkIfFileExists(event.getFile().getId());
         try {
-            Event saveEvent = getEventMapper().map(eventCreateDTO);
-            saveEvent.setStatus(Status.ACTIVE);
-            saveEvent.setUser(addUser);
-            saveEvent.setFile(addFile);
-            saveEvent.setCreatedAt(LocalDateTime.now());
-            saveEvent.setUpdatedAt(LocalDateTime.now());
-            Event savedEvent = getEventRepo().save(saveEvent);
-            EventDTO savedEventDTO = getEventMapper().map(savedEvent);
-            log.info("IN save() event -> '{}' saved SUCCESSFULLY", savedEventDTO);
-            return savedEventDTO;
+            event.setStatus(Status.ACTIVE);
+            event.setUser(addUser);
+            event.setFile(addFile);
+            event.setCreatedAt(LocalDateTime.now());
+            event.setUpdatedAt(LocalDateTime.now());
+            Event savedEvent = eventRepo.save(event);
+            log.info("IN save() event -> '{}' saved SUCCESSFULLY", savedEvent);
+            return savedEvent;
         } catch (DataAccessException e) {
-            log.error("IN save() event -> '{}' FAILED", eventCreateDTO, e);
-            throw new DatabaseOperationException(FAILED_TO_SAVE_A_EVENT + eventCreateDTO, e);
+            log.error("IN save() event -> '{}' FAILED", event, e);
+            throw new DatabaseOperationException(FAILED_TO_SAVE_A_EVENT + event, e);
         }
     }
 
     @Override
-    public EventDTO update(EventUpdateDTO eventUpdateDTO) {
-        log.info("IN update() event -> '{}'...", eventUpdateDTO);
-        Event existingEvent = checkIfEventExists(eventUpdateDTO.getId());
-        User newAddUser = checkIfUserExists(eventUpdateDTO.getUserId());
-        File newAddFile = checkIfFileExists(eventUpdateDTO.getFileId());
+    public Event update(Event event) {
+        log.info("IN update() event -> '{}'...", event);
+        final var existingEvent = checkIfEventExists(event.getId());
+        final var newAddUser = userService.checkIfUserExists(event.getUser().getId());
+        final var newAddFile = fileService.checkIfFileExists(event.getFile().getId());
         try {
-            Event updateEvent = getEventMapper().map(eventUpdateDTO);
-            updateEvent.setUser(newAddUser);
-            updateEvent.setFile(newAddFile);
-            updateFieldsIfDifferent(existingEvent, updateEvent);
+            event.setUser(newAddUser);
+            event.setFile(newAddFile);
+            updateFieldsIfDifferent(existingEvent, event);
             existingEvent.setUpdatedAt(LocalDateTime.now());
-            Event updatedEvent = getEventRepo().save(existingEvent);
-            EventDTO updatedEventDTO = getEventMapper().map(updatedEvent);
+            final var updatedEvent = eventRepo.save(existingEvent);
             log.info("IN update() event -> '{}' updated SUCCESSFULLY", updatedEvent);
-            return updatedEventDTO;
+            return updatedEvent;
         } catch (DataAccessException e) {
-            log.error("IN update() event -> by id - '{}' -> FAILED", eventUpdateDTO.getId(), e);
-            throw new DatabaseOperationException(format(FAILED_TO_UPDATE_A_EVENT_BY_ID, eventUpdateDTO.getId()), e);
+            log.error("IN update() event -> by id - '{}' -> FAILED", event.getId(), e);
+            throw new DatabaseOperationException(format(FAILED_TO_UPDATE_A_EVENT_BY_ID, event.getId()), e);
         }
     }
 
     @Override
-    public EventDTO findById(Long id) {
+    public Event findById(Long id) {
         try {
             log.info("IN findById(id) event -> by id - '{}'...", id);
-            Event foundEvent = getEventRepo().findById(id).orElseThrow(() -> new NotFoundException(format(NOT_FOUND_EVENT, id)));
-            EventDTO foundEventDTO = getEventMapper().map(foundEvent);
+            final var foundEvent = eventRepo.findById(id).orElseThrow(() -> new NotFoundException(format(NOT_FOUND_EVENT, id)));
             log.info("IN findById(id) event -> by id - '{}' found SUCCESSFULLY", id);
-            return foundEventDTO;
+            return foundEvent;
         } catch (DataAccessException e) {
             log.error("IN findById(id) event -> by id - '{}' -> FAILED", id, e);
             throw new DatabaseOperationException(format(FAILED_TO_FIND_A_EVENT_BY_ID, id), e);
@@ -100,12 +87,12 @@ public class EventServiceImpl extends BaseService implements EventService {
     }
 
     @Override
-    public List<EventDTO> findAll() {
+    public List<Event> findAll() {
         try {
             log.info("IN findAll() events ->...");
-            List<Event> foundAllEvents = getEventRepo().findAll(Sort.by(by(TEXT_NAME)));
+            final var foundAllEvents = eventRepo.findAll(Sort.by(by(TEXT_NAME)));
             log.info("IN findAll() events -> found all events - '{}' SUCCESSFULLY", foundAllEvents.size());
-            return foundAllEvents.stream().map(getEventMapper()::map).collect(Collectors.toList());
+            return foundAllEvents;
         } catch (DataAccessException e) {
             log.error("IN findAll() events -> FAILED", e);
             throw new DatabaseOperationException(FAILED_TO_FIND_ALL_EVENTS, e);
@@ -115,10 +102,10 @@ public class EventServiceImpl extends BaseService implements EventService {
     @Override
     public void deleteById(Long id) {
         log.info("IN deleteById(id) event -> delete by id - '{}'...", id);
-        Event deleteEvent = checkIfEventExists(id);
+        final var deleteEvent = checkIfEventExists(id);
         try {
             deleteEvent.setStatus(Status.DELETED);
-            getEventRepo().save(deleteEvent);
+            eventRepo.save(deleteEvent);
             log.info("IN deleteById(id) event -> delete by id - '{}' -> SUCCESSFULLY", id);
         } catch (DataAccessException e) {
             log.error("IN deleteById(id) event -> delete by id - '{}' -> FAILED", id);
@@ -130,8 +117,8 @@ public class EventServiceImpl extends BaseService implements EventService {
     public void deleteAll() {
         log.info("IN deleteAll() events -> ...");
         try {
-            List<EventDTO> eventsDTO = this.findAll();
-            eventsDTO.stream()
+            final var events = this.findAll();
+            events.stream()
                     .filter(eventDTO -> eventDTO.getStatus().equals(Status.ACTIVE))
                     .forEach(eventDTO -> {
                         eventDTO.setStatus(Status.DELETED);
@@ -141,6 +128,31 @@ public class EventServiceImpl extends BaseService implements EventService {
         } catch (DataAccessException e) {
             log.error("IN deleteAll() events -> FAILED");
             throw new DatabaseOperationException(FAILED_TO_DELETE_ALL_EVENTS, e);
+        }
+    }
+
+    private Event checkIfEventExists(Long id) {
+        try {
+            log.info("IN isExistsEvent(id) event -> by id - '{}'...", id);
+            final var foundEvent = eventRepo.findById(id)
+                    .orElseThrow(() -> new NotFoundException(format(NOT_FOUND_EVENT, id)));
+            log.info("IN isExistsEvent(id) event -> by id - '{}' -> found SUCCESSFULLY", id);
+            return foundEvent;
+        }catch (DataAccessException e){
+            log.error("IN isExistsEvent(id) event -> by id - '{}' -> FAILED", id, e);
+            throw new DatabaseOperationException(format(DATABASE_OPERATION_ERROR_FAILED_TO_FIND_EVENT, id), e);
+        }
+    }
+
+    public void updateFieldsIfDifferent(Event existingEvent, Event updatedEvent) {
+        if (!Objects.equals(existingEvent.getName(), updatedEvent.getName())) {
+            existingEvent.setName(updatedEvent.getName());
+        }
+        if (!Objects.equals(existingEvent.getUser(), updatedEvent.getUser())) {
+            existingEvent.setUser(updatedEvent.getUser());
+        }
+        if (!Objects.equals(existingEvent.getFile(), updatedEvent.getFile())) {
+            existingEvent.setFile(updatedEvent.getFile());
         }
     }
 }

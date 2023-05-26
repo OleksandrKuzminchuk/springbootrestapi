@@ -1,13 +1,12 @@
 package spring.boot.rest.api.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import spring.boot.rest.api.dto.FileDTO;
-import spring.boot.rest.api.dto.FileUpdateDTO;
+import spring.boot.rest.api.model.File;
 
-public interface FileService extends GenericService<FileDTO, FileDTO, FileUpdateDTO, Long> {
-    FileDTO findByS3Secret(String s3Secret);
-    FileDTO upload(MultipartFile newFile);
-    byte[] download(String s3Secret);
-    FileDTO renameFile(String existingS3Secret, String newFileName);
-    FileDTO updateFileContent(String existingS3Secret, MultipartFile newFile);
+public interface FileService extends GenericService<File, Long> {
+    File upload(MultipartFile newFile);
+    byte[] download(String location);
+    File updateName(Long id, String newFileName);
+    File updateFileContent(Long id, MultipartFile newFile);
+    File checkIfFileExists(Long id);
 }

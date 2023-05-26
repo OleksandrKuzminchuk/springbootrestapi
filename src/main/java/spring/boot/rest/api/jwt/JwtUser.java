@@ -12,6 +12,8 @@ import java.util.Collection;
 public class JwtUser implements UserDetails {
 
     private final Long id;
+    private final String firstName;
+    private final String lastName;
     private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -34,17 +36,17 @@ public class JwtUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return Boolean.TRUE;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return Boolean.TRUE;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return Boolean.TRUE;
     }
 
     @Override

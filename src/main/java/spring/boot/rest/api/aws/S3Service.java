@@ -12,7 +12,7 @@ import spring.boot.rest.api.exception.FileException;
 import java.io.IOException;
 import java.net.URL;
 
-import static spring.boot.rest.api.util.constant.Constants.FAILED_TO_RAED_ALL_BYTES_WHEN_GET_OBJECT_TO_S3_SERVICE;
+import static spring.boot.rest.api.util.Constants.FAILED_TO_RAED_ALL_BYTES_WHEN_GET_OBJECT_TO_S3_SERVICE;
 
 @Slf4j
 @Service

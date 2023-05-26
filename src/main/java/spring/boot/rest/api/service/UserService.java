@@ -1,12 +1,12 @@
 package spring.boot.rest.api.service;
 
-import spring.boot.rest.api.dto.EventDTO;
-import spring.boot.rest.api.dto.UserCreateDTO;
-import spring.boot.rest.api.dto.UserDTO;
-import spring.boot.rest.api.dto.UserUpdateDTO;
+import spring.boot.rest.api.model.File;
+import spring.boot.rest.api.model.User;
 
 import java.util.List;
 
-public interface UserService extends GenericService<UserDTO, UserCreateDTO, UserUpdateDTO, Long> {
-    List<EventDTO> findEvents(Long id);
+public interface UserService extends GenericService<User, Long> {
+    List<File> findFiles(Long id);
+    User checkIfUserExists(Long id);
+    boolean currentUserIsModeratorOrAdmin();
 }

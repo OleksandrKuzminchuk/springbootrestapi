@@ -4,14 +4,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
-import spring.boot.rest.api.dto.EventCreateDTO;
-import spring.boot.rest.api.dto.EventDTO;
-import spring.boot.rest.api.dto.EventUpdateDTO;
+import spring.boot.rest.api.dto.response.EventResponseDto;
+import spring.boot.rest.api.dto.request.EventCreateRequestDto;
+import spring.boot.rest.api.dto.request.EventUpdateRequestDto;
 import spring.boot.rest.api.model.Event;
 import spring.boot.rest.api.model.File;
 import spring.boot.rest.api.model.User;
 
-import static spring.boot.rest.api.util.constant.Constants.*;
+import static spring.boot.rest.api.util.Constants.*;
 
 @Component
 @Mapper(componentModel = TEXT_SPRING, uses = {UserMapper.class, FileMapper.class})
@@ -19,19 +19,19 @@ public interface EventMapper {
 
     @Mapping(source = "user", target = "userId", qualifiedByName = "mapUserToId")
     @Mapping(source = "file", target = "fileId", qualifiedByName = "mapFileToId")
-    EventDTO map(Event event);
+    EventResponseDto map(Event event);
 
     @Mapping(source = "userId", target = "user", qualifiedByName = "mapIdToUser")
     @Mapping(source = "fileId", target = "file", qualifiedByName = "mapIdToFile")
-    Event map(EventDTO eventDto);
+    Event map(EventResponseDto eventResponseDto);
 
     @Mapping(source = "userId", target = "user", qualifiedByName = "mapIdToUser")
     @Mapping(source = "fileId", target = "file", qualifiedByName = "mapIdToFile")
-    Event map(EventCreateDTO eventCreateDTO);
+    Event map(EventCreateRequestDto eventCreateRequestDto);
 
     @Mapping(source = "userId", target = "user", qualifiedByName = "mapIdToUser")
     @Mapping(source = "fileId", target = "file", qualifiedByName = "mapIdToFile")
-    Event map(EventUpdateDTO eventUpdateDTO);
+    Event map(EventUpdateRequestDto eventUpdateRequestDto);
 
     @Named("mapUserToId")
     default Long mapUserToId(User user) {

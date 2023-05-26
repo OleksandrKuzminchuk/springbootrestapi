@@ -1,65 +1,68 @@
 package spring.boot.rest.api.rest;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import spring.boot.rest.api.dto.EventCreateDTO;
-import spring.boot.rest.api.dto.EventDTO;
-import spring.boot.rest.api.dto.EventUpdateDTO;
+import spring.boot.rest.api.dto.response.EventResponseDto;
+import spring.boot.rest.api.dto.request.EventCreateRequestDto;
+import spring.boot.rest.api.dto.request.EventUpdateRequestDto;
+import spring.boot.rest.api.mapper.EventMapper;
 import spring.boot.rest.api.service.EventService;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static spring.boot.rest.api.util.Constants.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/events")
+@RequestMapping(URL_API_V1_EVENTS)
 @PreAuthorize("hasAuthority('read_write_delete:events')")
+@RequiredArgsConstructor
 public class EventRestControllerV1 {
 
     private final EventService eventService;
-
-    public EventRestControllerV1(EventService eventService) {
-        this.eventService = eventService;
-    }
+    private final EventMapper eventMapper;
 
     @PostMapping
-    public ResponseEntity<EventDTO> create(@RequestBody EventCreateDTO eventCreateDTO) {
-        log.info("IN [POST] create() -> creating event: {}", eventCreateDTO);
-        EventDTO createdEventDTO = eventService.save(eventCreateDTO);
-        log.info("IN [POST] create() -> created event: {} -> SUCCESSFULLY", createdEventDTO);
-        return new ResponseEntity<>(createdEventDTO, HttpStatus.CREATED);
+    public ResponseEntity<EventResponseDto> create(@RequestBody EventCreateRequestDto eventCreateRequestDto) {
+        log.info("IN [POST] create() -> creating event: {}", eventCreateRequestDto);
+        final var createdEventResponseDto = eventMapper.map(eventService.save(eventMapper.map(eventCreateRequestDto)));
+        log.info("IN [POST] create() -> created event: {} -> SUCCESSFULLY", createdEventResponseDto);
+        return new ResponseEntity<>(createdEventResponseDto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EventDTO> update(@PathVariable("id") Long id,
-                                           @RequestBody EventUpdateDTO eventUpdateDTO) {
-        log.info("IN update() - updating event: {}", eventUpdateDTO);
-        eventUpdateDTO.setId(id);
-        EventDTO updatedEventDTO = eventService.update(eventUpdateDTO);
-        log.info("IN update() - event updated: {} -> SUCCESSFULLY", updatedEventDTO);
-        return new ResponseEntity<>(updatedEventDTO, HttpStatus.OK);
+    @PutMapping(URL_ID)
+    public ResponseEntity<EventResponseDto> update(@PathVariable(ID) Long id,
+                                                   @RequestBody EventUpdateRequestDto eventUpdateRequestDto) {
+        log.info("IN update() - updating event: {}", eventUpdateRequestDto);
+        eventUpdateRequestDto.setId(id);
+        final var updatedEventResponseDto = eventMapper.map(eventService.update(eventMapper.map(eventUpdateRequestDto)));
+        log.info("IN update() - event updated: {} -> SUCCESSFULLY", updatedEventResponseDto);
+        return new ResponseEntity<>(updatedEventResponseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EventDTO> findById(@PathVariable("id") Long id) {
+    @GetMapping(URL_ID)
+    public ResponseEntity<EventResponseDto> findById(@PathVariable(ID) Long id) {
         log.info("IN getById() - getting event by id '{}'", id);
-        EventDTO eventDTO = eventService.findById(id);
-        log.info("IN getById() - event with id '{}' found: {} -> SUCCESSFULLY", id, eventDTO);
-        return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+        final var eventResponseDto = eventMapper.map(eventService.findById(id));
+        log.info("IN getById() - event with id '{}' found: {} -> SUCCESSFULLY", id, eventResponseDto);
+        return new ResponseEntity<>(eventResponseDto, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<EventDTO>> findAll() {
+    public ResponseEntity<List<EventResponseDto>> findAll() {
         log.info("IN getAll() - getting all events");
-        List<EventDTO> events = eventService.findAll();
+        final var events = eventService.findAll().stream().map(eventMapper::map).toList();
         log.info("IN getAll() - found {} events: {} -> SUCCESSFULLY", events.size(), events);
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
+    @DeleteMapping(URL_ID)
+    public ResponseEntity<Void> deleteById(@PathVariable(ID) Long id) {
         log.info("IN deleteById() - deleting event with id '{}'", id);
         eventService.deleteById(id);
         log.info("IN deleteById() - event with id '{}' deleted SUCCESSFULLY", id);
@@ -67,7 +70,7 @@ public class EventRestControllerV1 {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteAll() {
+    public ResponseEntity<Void> deleteAll() {
         log.info("IN deleteAll() - deleting all events");
         eventService.deleteAll();
         log.info("IN deleteAll() - all events deleted SUCCESSFULLY");

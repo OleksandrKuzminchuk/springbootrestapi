@@ -1,7 +1,7 @@
 package spring.boot.rest.api.rest;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,87 +9,88 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import spring.boot.rest.api.dto.FileDTO;
-import spring.boot.rest.api.dto.request.FileDownloadRequest;
-import spring.boot.rest.api.dto.request.FileRenameRequest;
-import spring.boot.rest.api.dto.request.FileUpdateContentRequest;
+import spring.boot.rest.api.dto.response.FileResponseDto;
+import spring.boot.rest.api.dto.request.FileDownloadRequestDto;
+import spring.boot.rest.api.dto.request.FileRenameRequestDto;
+import spring.boot.rest.api.mapper.FileMapper;
 import spring.boot.rest.api.service.FileService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static spring.boot.rest.api.util.constant.Constants.URL_API_V1_FILES;
+import static spring.boot.rest.api.util.Constants.*;
 
 @Slf4j
 @RestController
 @RequestMapping(URL_API_V1_FILES)
 @PreAuthorize("hasAuthority('read_write_delete:files')")
+@RequiredArgsConstructor
 public class FileRestControllerV1 {
+
     private final FileService fileService;
+    private final FileMapper fileMapper;
 
-    @Autowired
-    public FileRestControllerV1(FileService fileService) {
-        this.fileService = fileService;
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<FileDTO> uploadFile(@RequestParam("file") MultipartFile file) {
+    @PostMapping(URL_UPLOAD)
+    public ResponseEntity<FileResponseDto> uploadFile(@RequestParam(FILE) MultipartFile file) {
         log.info("IN [POST] uploadFile() -> uploading file...");
-        FileDTO uploadedFile = fileService.upload(file);
+        final var uploadedFile = fileMapper.map(fileService.upload(file));
         log.info("IN [POST] uploadFile() -> file uploaded -> SUCCESSFULLY");
         return new ResponseEntity<>(uploadedFile, HttpStatus.CREATED);
     }
 
-    @PutMapping("/rename")
-    public ResponseEntity<FileDTO> renameFile(@RequestBody FileRenameRequest request) {
-        log.info("IN renameFile() -> renaming file...");
-        FileDTO updatedFileDTO = fileService.renameFile(request.getExistingS3Secret(), request.getNewFileName());
-        log.info("IN renameFile() -> file renamed SUCCESSFULLY");
-        return new ResponseEntity<>(updatedFileDTO, HttpStatus.OK);
+    @PutMapping(URL_ID)
+    public ResponseEntity<FileResponseDto> updateName(@PathVariable(ID) Long id,
+                                                      @RequestBody FileRenameRequestDto request) {
+        log.info("IN updateName() -> updating file...");
+        final var updatedFileResponseDto = fileMapper.map(fileService.updateName(id, request.getNewFileName()));
+        log.info("IN updateName() -> file updated SUCCESSFULLY");
+        return new ResponseEntity<>(updatedFileResponseDto, HttpStatus.OK);
     }
 
-    @PutMapping("/update-content")
-    public ResponseEntity<FileDTO> updateFileContent(@ModelAttribute FileUpdateContentRequest request) {
+    @PutMapping(URL_ID_UPDATE_CONTENT)
+    public ResponseEntity<FileResponseDto> updateFileContent(@PathVariable(ID) Long id,
+                                                             @ModelAttribute MultipartFile file) {
         log.info("IN updateFileContent() -> updating file content...");
-        FileDTO updatedFileDTO = fileService.updateFileContent(request.getExistingS3Secret(), request.getFile());
+        final var updatedFileResponseDto = fileMapper.map(fileService.updateFileContent(id, file));
         log.info("IN updateFileContent() -> file content updated SUCCESSFULLY");
-        return new ResponseEntity<>(updatedFileDTO, HttpStatus.OK);
+        return new ResponseEntity<>(updatedFileResponseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/download")
+    @GetMapping(URL_DOWNLOAD)
     @PreAuthorize("hasAuthority('download:file')")
-    public ResponseEntity<byte[]> downloadFile(@RequestBody FileDownloadRequest request) {
+    public ResponseEntity<byte[]> downloadFile(@RequestBody FileDownloadRequestDto request) {
         log.info("IN downloadFile() -> downloading file...");
-        String fileName = request.getS3Secret()
-                .substring(request.getS3Secret().lastIndexOf("/") + 1);
-        byte[] fileContent = fileService.download(request.getS3Secret());
-        HttpHeaders headers = new HttpHeaders();
+        final var fileName = request.getLocation()
+                .substring(request.getLocation().lastIndexOf(SLASH) + ONE);
+        final var fileContent = fileService.download(request.getLocation());
+        final var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        String filename = "attachment;filename=" + fileName;
+        final var filename = ATTACHMENT_FILENAME + fileName;
         headers.setContentDispositionFormData(filename, filename);
-        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        headers.setCacheControl(MUST_REVALIDATE_POST_CHECK_0);
         log.info("IN downloadFile() -> file downloaded SUCCESSFULLY");
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
 
     @GetMapping()
-    public ResponseEntity<List<FileDTO>> findAll() {
+    public ResponseEntity<List<FileResponseDto>> findAll() {
         log.info("IN findAll() -> finding all files...");
-        List<FileDTO> files = fileService.findAll();
+        final var files = fileService.findAll().stream().map(fileMapper::map).toList();
         log.info("IN findAll() -> found all files SUCCESSFULLY");
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<FileDTO> findById(@PathVariable Long id) {
+    @GetMapping(URL_ID)
+    public ResponseEntity<FileResponseDto> findById(@PathVariable(ID) Long id) {
         log.info("IN [GET] findById() file -> find by id - '{}'...", id);
-        FileDTO fileDTO = fileService.findById(id);
+        final var fileResponseDto = fileMapper.map(fileService.findById(id));
         log.info("IN [GET] findById() file -> found by id - '{}' -> SUCCESSFULLY", id);
-        return new ResponseEntity<>(fileDTO, HttpStatus.OK);
+        return new ResponseEntity<>(fileResponseDto, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
+    @DeleteMapping(URL_ID)
+    public ResponseEntity<Void> deleteById(@PathVariable(ID) Long id) {
         log.info("IN [DELETE] deleteById() -> deleting the file by id - '{}'...", id);
         fileService.deleteById(id);
         log.info("IN [DELETE] deleteById() -> deleting the file by id - '{}' -> SUCCESSFULLY", id);
@@ -97,7 +98,7 @@ public class FileRestControllerV1 {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteAll() {
+    public ResponseEntity<Void> deleteAll() {
         log.info("IN [DELETE] deleteAll() -> delete all files...");
         fileService.deleteAll();
         log.info("IN [DELETE] deleteAll() -> delete all files -> SUCCESSFULLY");

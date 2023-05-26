@@ -1,8 +1,6 @@
 package spring.boot.rest.api.service;
 
-import spring.boot.rest.api.dto.EventCreateDTO;
-import spring.boot.rest.api.dto.EventDTO;
-import spring.boot.rest.api.dto.EventUpdateDTO;
+import spring.boot.rest.api.model.Event;
 
-public interface EventService extends GenericService<EventDTO, EventCreateDTO, EventUpdateDTO, Long> {
+public interface EventService extends GenericService<Event, Long> {
 }

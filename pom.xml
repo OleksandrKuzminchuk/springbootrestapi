@@ -20,7 +20,8 @@
         <org.mockito.junit.version>4.5.1</org.mockito.junit.version>
         <software.amazon.awssdk.version>2.20.26</software.amazon.awssdk.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-
+        <javafaker.version>1.0.2</javafaker.version>
+        <jackson-datatype-jsr310.version>2.15.1</jackson-datatype-jsr310.version>
     </properties>
 
     <dependencies>
@@ -106,6 +107,24 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>${javafaker.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-datatype-jsr310.version}</version>
         </dependency>
     </dependencies>
 

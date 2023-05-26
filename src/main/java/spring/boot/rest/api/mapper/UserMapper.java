@@ -1,26 +1,30 @@
 package spring.boot.rest.api.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.springframework.stereotype.Component;
-import spring.boot.rest.api.dto.UserCreateDTO;
-import spring.boot.rest.api.dto.UserDTO;
-import spring.boot.rest.api.dto.UserUpdateDTO;
+import spring.boot.rest.api.dto.response.UserResponseDto;
+import spring.boot.rest.api.dto.request.UserUpdateRequestDto;
 import spring.boot.rest.api.model.User;
 
-import static spring.boot.rest.api.util.constant.Constants.TEXT_SPRING;
-import static spring.boot.rest.api.util.constant.Constants.TEXT_STATUS;
+import static spring.boot.rest.api.util.Constants.TEXT_SPRING;
 
 @Component
 @Mapper(componentModel = TEXT_SPRING)
 public interface UserMapper {
 
-    @Mapping(source = TEXT_STATUS, target = TEXT_STATUS)
-    UserDTO map(User user);
+    @Mapping(source = "role", target = "role")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "updatedAt", target = "updatedAt")
+    UserResponseDto map(User user);
 
-    User map(UserDTO userDto);
+    @Mapping(source = "role", target = "role")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "updatedAt", target = "updatedAt")
+    User map(UserResponseDto userResponseDto);
 
-    User map(UserCreateDTO userCreateDTO);
-
-    User map(UserUpdateDTO userUpdateDTO);
+    User map(UserUpdateRequestDto userUpdateRequestDto);
 }
+
+
