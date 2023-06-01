@@ -40,7 +40,7 @@ public class SecurityConfiguration {
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers(AUTHENTICATION_ENDPOINT, REFRESH_TOKEN_ENDPOINT).permitAll()
+                .requestMatchers(API_V1_AUTH).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -14,7 +14,6 @@ import spring.boot.rest.api.mapper.UserMapper;
 import spring.boot.rest.api.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static spring.boot.rest.api.util.Constants.*;
 

@@ -56,8 +56,7 @@ public final class Constants {
 
     public static final String RUNTIME_EXCEPTION = "Runtime exception";
     public static final String ERROR_EXCEPTION = "Error exception";
-    public static final String AUTHENTICATION_ENDPOINT = "/api/v1/auth/authenticate";
-    public static final String REFRESH_TOKEN_ENDPOINT = "/api/v1/auth/refresh_token";
+    public static final String API_V1_AUTH = "/api/v1/auth/**";
     public static final String FAILED_TO_FIND_TOKEN = "Failed to find token";
     public static final String URL_API_V1_AUTH_LOGOUT = "/api/v1/auth/logout";
     public static final String BEARER = "Bearer ";

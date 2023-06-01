@@ -11,3 +11,20 @@ MODERATOR - права USER + чтение всех User + чтение/изме
 USER - только чтение всех своих данных + загрузка файлов для себя
 
 Технологии: Java, MySQL, Spring (IoC, Data, Security), AWS SDK, MySQL, Docker, JUnit, Mockito, Gradle.
+
+# Запуск maven clean package с application-local.yml : `mvn clean package -Dspring.profiles.active=local`
+
+# Запуск maven run с application-local.yml : `mvn spring-boot:run -Dspring-boot.run.profiles=local`
+
+
+# Для создания docker:
+
+# -image : `docker build -t spring-boot-rest-api-v1 .`
+
+# -container : `docker run -p 8080:8080 --name spring-boot-rest-api-v1 --restart always -d spring-boot-rest-api-v1`
+
+# -stop container : `docker stop <ID container>`
+
+# -remove container : `docker container rm <container_id>`
+
+# -remove image : `docker image rm <image_id>`
