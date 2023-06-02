@@ -1,4 +1,4 @@
-package spring.boot.rest.api.aws;
+package spring.boot.rest.api.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

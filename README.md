@@ -19,9 +19,9 @@ USER - только чтение всех своих данных + загруз
 
 # Для создания docker:
 
-# -image : `docker build -t spring-boot-rest-api-v1 .`
+# -image : `docker build -t spring-boot-rest-api:1.0.0 .`
 
-# -container : `docker run -p 8080:8080 --name spring-boot-rest-api-v1 --restart always -d spring-boot-rest-api-v1`
+# -container : `docker run -p 8080:8080 --name spring-boot-rest-api-v1 --restart always -d spring-boot-rest-api:1.0.0`
 
 # -stop container : `docker stop <ID container>`
 
