@@ -36,7 +36,7 @@ import static spring.boot.rest.api.util.TestConstants.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles(TEST_TEXT)
 class AuthenticationRestControllerV1Test {
 
     @Autowired

@@ -22,5 +22,6 @@ public final class TestConstants {
     public static final String TEST_URL_API_V1_USERS_ID_FILES = TEST_URL_API_V1_USERS_ID + "/files";
     public static final String TEST_TEXT_RANDOM_FILE_NAME = "random";
     public static final String TEST_TEXT_PUT = "PUT";
+    public static final String TEST_TEXT = "test";
     public static final String INVALID_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpYXQiOjE2ODQ1MDk4NjIsImV4cCI6MTY4NDUxMzQ2Mn0.EH9Aa-hR5EsoN4li4Qcce3Niclll4bQghXpOqoutiVY";
 }
