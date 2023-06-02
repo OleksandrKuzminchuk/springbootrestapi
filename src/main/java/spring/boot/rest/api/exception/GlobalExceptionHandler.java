@@ -53,26 +53,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Error.class)
     public ResponseEntity<ErrorResponse> handleError(Error e) {
-        Throwable cause = e;
-        while (cause.getCause() != null) {
-            cause = cause.getCause();
-            if (cause instanceof AccessDeniedException deniedException) {
-                return this.handleAccessDeniedException(deniedException);
-            }
-        }
         ErrorResponse response = getResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_EXCEPTION, e.getMessage());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
-        Throwable cause = e;
-        while (cause.getCause() != null) {
-            cause = cause.getCause();
-            if (cause instanceof AccessDeniedException deniedException) {
-                return this.handleAccessDeniedException(deniedException);
-            }
-        }
         ErrorResponse response = getResponse(HttpStatus.INTERNAL_SERVER_ERROR, RUNTIME_EXCEPTION, e.getMessage());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
