@@ -16,6 +16,8 @@ USER - только чтение всех своих данных + загруз
 
 # Запуск maven run с application-local.yml : `mvn spring-boot:run -Dspring-boot.run.profiles=local`
 
+# Запуск maven test с application-test.yml : `mvn test -Dspring.profiles.active=test`
+
 
 # Для создания docker:
 

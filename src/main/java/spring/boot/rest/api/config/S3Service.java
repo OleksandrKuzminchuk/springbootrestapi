@@ -1,5 +1,6 @@
 package spring.boot.rest.api.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,10 @@ import static spring.boot.rest.api.util.Constants.FAILED_TO_RAED_ALL_BYTES_WHEN_
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class S3Service {
 
     private final S3Client s3;
-
-    @Autowired
-    public S3Service(S3Client s3Client) {
-        this.s3 = s3Client;
-    }
 
     public String putObject(String bucketName, String key, byte[] file) {
         log.info("IN putObject() -> processing...");

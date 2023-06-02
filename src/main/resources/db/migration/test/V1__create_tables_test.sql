@@ -1,5 +1,5 @@
 CREATE TABLE users (
-                       id INT PRIMARY KEY AUTO_INCREMENT,
+                       id BIGINT PRIMARY KEY AUTO_INCREMENT,
                        first_name VARCHAR(255) NOT NULL,
                        last_name VARCHAR(255) NOT NULL,
                        email VARCHAR(255) NOT NULL UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE files (
-                       id INT PRIMARY KEY AUTO_INCREMENT,
+                       id BIGINT PRIMARY KEY AUTO_INCREMENT,
                        name VARCHAR(255) NOT NULL,
                        s3_secret VARCHAR(500) NOT NULL UNIQUE,
                        s3_bucket VARCHAR(255) NOT NULL,
@@ -22,10 +22,10 @@ CREATE TABLE files (
 );
 
 CREATE TABLE events (
-                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
                         name VARCHAR(255) NOT NULL UNIQUE,
-                        user_id INT NOT NULL,
-                        file_id INT NOT NULL,
+                        user_id BIGINT NOT NULL,
+                        file_id BIGINT NOT NULL,
                         created_at TIMESTAMP NOT NULL,
                         updated_at TIMESTAMP NOT NULL,
                         status VARCHAR(20) NOT NULL,
@@ -34,8 +34,8 @@ CREATE TABLE events (
 );
 
 CREATE TABLE tokens (
-                       id INT PRIMARY KEY AUTO_INCREMENT,
-                       token VARCHAR(255) NOT NULL,
+                       id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                       token VARCHAR(600) NOT NULL,
                        token_type VARCHAR(20) NOT NULL,
                        expired BOOLEAN NOT NULL,
                        revoked BOOLEAN NOT NULL,
