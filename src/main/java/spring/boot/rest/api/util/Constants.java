@@ -56,7 +56,6 @@ public final class Constants {
 
     public static final String RUNTIME_EXCEPTION = "Runtime exception";
     public static final String ERROR_EXCEPTION = "Error exception";
-    public static final String API_V1_AUTH = "/api/v1/auth/**";
     public static final String FAILED_TO_FIND_TOKEN = "Failed to find token";
     public static final String URL_API_V1_AUTH_LOGOUT = "/api/v1/auth/logout";
     public static final String BEARER = "Bearer ";
@@ -100,6 +99,8 @@ public final class Constants {
     public static final String URL_AUTHENTICATE = "/authenticate";
     public static final String URL_REGISTER = "/register";
     public static final String URL_REFRESH_TOKEN = "/refresh_token";
+    public static final String FULL_URL_AUTHENTICATE = URL_API_V1_AUTH + URL_AUTHENTICATE;
+    public static final String FULL_URL_REGISTER = URL_API_V1_AUTH + URL_REGISTER;
     public static final String URL_ID = "/{id}";
     public static final String URL_ID_UPDATE_CONTENT = URL_ID + "/update-content";
     public static final String URL_DOWNLOAD = "/download";
