@@ -74,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         } catch (AuthenticationException e) {
-            log.error("Authentication failed for user " + request.getEmail(), e);
+            log.error("Authentication failed for user " + request.getEmail());
             throw new BadCredentialsException("Invalid email or password");
         }
         final var user = getUserByEmail(request.getEmail());
